@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { MessageCircle, Package, Star } from "lucide-react";
 import { generateWhatsAppLink, formatRupiah } from "@/lib/utils";
 import type { Product } from "@/types";

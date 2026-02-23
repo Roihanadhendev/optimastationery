@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search, Menu, ShoppingCart } from "lucide-react";
+import { Search, Menu } from "lucide-react";
 
 export function Navbar() {
     return (

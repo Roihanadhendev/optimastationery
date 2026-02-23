@@ -4,8 +4,7 @@ import { getCategories, getProducts } from "@/lib/actions";
 import { CatalogSidebar } from "@/components/catalog/CatalogSidebar";
 import { CatalogSort } from "@/components/catalog/CatalogSort";
 import { ProductCard } from "@/components/catalog/ProductCard";
-import { ProductGridSkeleton } from "@/components/catalog/ProductSkeleton";
-import { Package, Search } from "lucide-react";
+import { Package } from "lucide-react";
 import type { SortOption } from "@/types";
 
 export const revalidate = 3600; // ISR: revalidate every hour
