@@ -9,11 +9,20 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboard() {
     const stats = await getDashboardStats();
 
-    const recentInquiries = await prisma.inquiry.findMany({
+    interface InquiryRow {
+        id: string;
+        productName: string;
+        customerPhone: string | null;
+        source: string;
+        createdAt: Date;
+        product: { name: string; sku: string } | null;
+    }
+
+    const recentInquiries: InquiryRow[] = await prisma.inquiry.findMany({
         include: { product: { select: { name: true, sku: true } } },
         orderBy: { createdAt: "desc" },
         take: 5,
-    });
+    }) as InquiryRow[];
 
     const statCards = [
         {

@@ -12,7 +12,7 @@ export async function GET() {
         });
 
         return NextResponse.json({
-            categories: categories.map((c) => ({
+            categories: categories.map((c: { id: string; name: string; slug: string }) => ({
                 id: c.id,
                 name: c.name,
                 slug: c.slug,

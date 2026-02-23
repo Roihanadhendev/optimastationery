@@ -11,6 +11,15 @@ import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
+interface InquiryRow {
+    id: string;
+    productName: string;
+    customerPhone: string | null;
+    source: string;
+    createdAt: Date;
+    product: { id: string; name: string; sku: string } | null;
+}
+
 interface PageProps {
     searchParams: Promise<{ page?: string }>;
 }
@@ -18,7 +27,7 @@ interface PageProps {
 export default async function InquiriesPage({ searchParams }: PageProps) {
     const params = await searchParams;
     const page = Number(params.page) || 1;
-    const { inquiries, totalPages } = await getInquiries({ page });
+    const { inquiries, totalPages } = await getInquiries({ page }) as { inquiries: InquiryRow[]; totalPages: number };
 
     return (
         <div className="space-y-6">
