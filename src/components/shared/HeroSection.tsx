@@ -93,7 +93,7 @@ export function HeroSection() {
                         </div>
 
                         {/* Floating badge */}
-                        <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-center gap-4 animate-bounce hover:animate-none">
+                        <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-slate-100 flex items-center gap-4 animate-bounce hover:animate-none z-20">
                             <div className="flex -space-x-3">
                                 <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs">A</div>
                                 <div className="w-10 h-10 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-xs">B</div>
