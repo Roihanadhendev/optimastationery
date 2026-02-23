@@ -34,18 +34,18 @@ export async function getProducts({
     page?: number;
     pageSize?: number;
 }) {
-    const where: Record<string, unknown> = {};
+    const searchFilter = search
+        ? {
+            OR: [
+                { name: { contains: search, mode: "insensitive" as const } },
+                { sku: { contains: search, mode: "insensitive" as const } },
+            ],
+        }
+        : {};
 
-    if (search) {
-        where.OR = [
-            { name: { contains: search, mode: "insensitive" } },
-            { sku: { contains: search, mode: "insensitive" } },
-        ];
-    }
+    const categoryFilter = categoryId ? { categoryId } : {};
 
-    if (categoryId) {
-        where.categoryId = categoryId;
-    }
+    const where = { ...searchFilter, ...categoryFilter };
 
     const [products, total] = await Promise.all([
         prisma.product.findMany({

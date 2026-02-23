@@ -25,14 +25,14 @@ const formSchema = z.object({
     name: z.string().min(1, "Nama produk wajib diisi"),
     sku: z.string().min(1, "SKU wajib diisi"),
     categoryId: z.string().min(1, "Kategori wajib dipilih"),
-    price: z.number().min(0, "Harga minimal 0"),
+    price: z.coerce.number().min(0, "Harga minimal 0"),
     stockStatus: z.boolean(),
     description: z.string().optional(),
     imageUrl: z.string().optional(),
     isFeatured: z.boolean(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.input<typeof formSchema>;
 
 interface Category {
     id: string;
@@ -57,8 +57,7 @@ export function ProductForm({ categories, defaultValues }: ProductFormProps) {
         watch,
         formState: { errors },
     } = useForm<FormValues>({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        resolver: zodResolver(formSchema) as any,
+        resolver: zodResolver(formSchema),
         defaultValues: defaultValues ?? {
             name: "",
             sku: "",
