@@ -79,7 +79,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Calculate new prices
-        const priceChanges = products.map((product) => {
+        type PrismaProduct = {
+            id: string;
+            name: string;
+            sku: string;
+            price: { toString: () => string } | number | string;
+        };
+
+        const priceChanges = products.map((product: PrismaProduct) => {
             const currentPrice = Number(product.price);
             let delta: number;
 
@@ -124,8 +131,16 @@ export async function POST(request: NextRequest) {
         }
 
         // ── EXECUTE: atomic batch update using $transaction ──
-        const result = await prisma.$transaction(async (tx) => {
-            const updatePromises = priceChanges.map(async (change) => {
+        type TxClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+        type PriceChange = {
+            id: string;
+            currentPrice: number;
+            newPrice: number;
+        };
+
+        const result = await prisma.$transaction(async (tx: TxClient) => {
+            const updatePromises = priceChanges.map(async (change: PriceChange) => {
                 // Update the product price
                 await tx.product.update({
                     where: { id: change.id },
