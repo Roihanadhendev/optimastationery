@@ -58,8 +58,24 @@ export async function getProducts({
         prisma.product.count({ where }),
     ]);
 
+    type PrismaProduct = {
+        id: string;
+        name: string;
+        sku: string;
+        slug: string;
+        categoryId: string | null;
+        price: { toString: () => string } | number | string;
+        stockStatus: boolean;
+        description: string | null;
+        imageUrl: string | null;
+        isFeatured: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        category: { id: string; name: string; slug: string } | null;
+    };
+
     return {
-        products: products.map((p) => ({
+        products: products.map((p: PrismaProduct) => ({
             ...p,
             price: Number(p.price),
         })),

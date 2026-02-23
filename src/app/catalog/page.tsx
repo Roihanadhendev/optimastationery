@@ -5,7 +5,7 @@ import { CatalogSidebar } from "@/components/catalog/CatalogSidebar";
 import { CatalogSort } from "@/components/catalog/CatalogSort";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Package } from "lucide-react";
-import type { SortOption } from "@/types";
+import type { Product, SortOption } from "@/types";
 
 export const revalidate = 3600; // ISR: revalidate every hour
 
@@ -108,7 +108,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                         {/* Product Grid */}
                         {products.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {products.map((product) => (
+                                {products.map((product: Product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>
