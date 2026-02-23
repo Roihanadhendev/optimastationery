@@ -2,6 +2,8 @@ export interface Category {
     id: string;
     name: string;
     slug: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Product {
@@ -11,13 +13,13 @@ export interface Product {
     slug: string;
     sku: string;
     description: string | null;
-    price: number;
+    price: number; // Using number for representation, Prisma uses Decimal
     stockStatus: boolean;
     imageUrl: string | null;
     isFeatured: boolean;
     category?: Category;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface PriceLog {
@@ -27,7 +29,7 @@ export interface PriceLog {
     newPrice: number;
     changedBy: string;
     reason: string | null;
-    createdAt: string;
+    createdAt: Date;
 }
 
 export interface Inquiry {
@@ -36,7 +38,7 @@ export interface Inquiry {
     productName: string;
     customerPhone: string | null;
     source: string;
-    createdAt: string;
+    createdAt: Date;
     product?: Pick<Product, "id" | "name" | "sku"> | null;
 }
 

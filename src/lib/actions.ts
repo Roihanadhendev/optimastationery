@@ -1,17 +1,27 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { SortOption } from "@/types";
+import type { SortOption, Category, Product } from "@/types";
 
-export async function getCategories() {
+export async function getCategories(): Promise<Category[]> {
     const categories = await prisma.category.findMany({
         orderBy: { name: "asc" },
     });
 
-    return categories.map((c) => ({
+    type PrismaCategory = {
+        id: string;
+        name: string;
+        slug: string;
+        createdAt: Date;
+        updatedAt: Date;
+    };
+
+    return categories.map((c: PrismaCategory) => ({
         id: c.id,
         name: c.name,
         slug: c.slug,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
     }));
 }
 
@@ -23,7 +33,7 @@ export async function getProducts({
     categories?: string[];
     sort?: SortOption;
     search?: string;
-}) {
+}): Promise<Product[]> {
     const orderBy = (() => {
         switch (sort) {
             case "price-asc":
@@ -36,18 +46,20 @@ export async function getProducts({
         }
     })();
 
-    const where: Record<string, unknown> = {};
+    const categoryFilter = categories && categories.length > 0
+        ? { category: { slug: { in: categories } } }
+        : {};
 
-    if (categories && categories.length > 0) {
-        where.category = { slug: { in: categories } };
-    }
+    const searchFilter = search
+        ? {
+            OR: [
+                { name: { contains: search, mode: "insensitive" as const } },
+                { sku: { contains: search, mode: "insensitive" as const } },
+            ],
+        }
+        : {};
 
-    if (search) {
-        where.OR = [
-            { name: { contains: search, mode: "insensitive" } },
-            { sku: { contains: search, mode: "insensitive" } },
-        ];
-    }
+    const where = { ...categoryFilter, ...searchFilter };
 
     const products = await prisma.product.findMany({
         where,
@@ -55,7 +67,29 @@ export async function getProducts({
         include: { category: true },
     });
 
-    return products.map((p) => ({
+    type PrismaProduct = {
+        id: string;
+        categoryId: string;
+        name: string;
+        slug: string;
+        sku: string;
+        description: string | null;
+        price: { toString: () => string } | number | string;
+        stockStatus: boolean;
+        imageUrl: string | null;
+        isFeatured: boolean;
+        category: {
+            id: string;
+            name: string;
+            slug: string;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+        createdAt: Date;
+        updatedAt: Date;
+    };
+
+    return products.map((p: PrismaProduct) => ({
         id: p.id,
         categoryId: p.categoryId,
         name: p.name,
@@ -67,9 +101,15 @@ export async function getProducts({
         imageUrl: p.imageUrl,
         isFeatured: p.isFeatured,
         category: p.category
-            ? { id: p.category.id, name: p.category.name, slug: p.category.slug }
+            ? {
+                id: p.category.id,
+                name: p.category.name,
+                slug: p.category.slug,
+                createdAt: p.category.createdAt,
+                updatedAt: p.category.updatedAt
+            }
             : undefined,
-        createdAt: p.createdAt.toISOString(),
-        updatedAt: p.updatedAt.toISOString(),
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
     }));
 }

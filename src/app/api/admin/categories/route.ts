@@ -11,8 +11,16 @@ export async function GET() {
             orderBy: { name: "asc" },
         });
 
+        type PrismaCategory = {
+            id: string;
+            name: string;
+            slug: string;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+
         return NextResponse.json({
-            categories: categories.map((c: { id: string; name: string; slug: string }) => ({
+            categories: categories.map((c: PrismaCategory) => ({
                 id: c.id,
                 name: c.name,
                 slug: c.slug,

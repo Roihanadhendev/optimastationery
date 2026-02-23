@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { Product } from "@/types";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -88,7 +89,7 @@ export async function getCategories() {
     return prisma.category.findMany({ orderBy: { name: "asc" } });
 }
 
-export async function createProduct(formData: FormData) {
+export async function createProduct(formData: FormData): Promise<{ success: boolean }> {
     const raw = Object.fromEntries(formData.entries());
     const parsed = productSchema.parse({
         ...raw,
@@ -110,7 +111,7 @@ export async function createProduct(formData: FormData) {
     return { success: true };
 }
 
-export async function updateProduct(id: string, formData: FormData) {
+export async function updateProduct(id: string, formData: FormData): Promise<{ success: boolean }> {
     const raw = Object.fromEntries(formData.entries());
     const parsed = productSchema.parse({
         ...raw,
@@ -145,7 +146,7 @@ export async function updateProduct(id: string, formData: FormData) {
     return { success: true };
 }
 
-export async function deleteProduct(id: string) {
+export async function deleteProduct(id: string): Promise<{ success: boolean }> {
     await prisma.product.delete({ where: { id } });
     revalidatePath("/admin/products");
     return { success: true };
@@ -156,7 +157,7 @@ export async function bulkUpdatePrices(
     adjustmentType: "percentage" | "fixed",
     adjustmentValue: number,
     reason: string
-) {
+): Promise<{ success: boolean }> {
     const products = await prisma.product.findMany({
         where: { id: { in: productIds } },
     });
@@ -192,16 +193,35 @@ export async function bulkUpdatePrices(
     return { success: true };
 }
 
-export async function getProductById(id: string) {
-    const product = await prisma.product.findUnique({
+export async function getProductById(id: string): Promise<Product | null> {
+    const p = await prisma.product.findUnique({
         where: { id },
         include: { category: true },
     });
 
-    if (!product) return null;
+    if (!p) return null;
 
     return {
-        ...product,
-        price: Number(product.price),
+        id: p.id,
+        categoryId: p.categoryId,
+        name: p.name,
+        slug: p.slug,
+        sku: p.sku,
+        description: p.description,
+        price: Number(p.price),
+        stockStatus: p.stockStatus,
+        imageUrl: p.imageUrl,
+        isFeatured: p.isFeatured,
+        category: p.category
+            ? {
+                id: p.category.id,
+                name: p.category.name,
+                slug: p.category.slug,
+                createdAt: p.category.createdAt,
+                updatedAt: p.category.updatedAt
+            }
+            : undefined,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
     };
 }

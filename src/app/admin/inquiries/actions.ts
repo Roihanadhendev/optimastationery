@@ -1,13 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import type { Inquiry } from "@/types";
 import { revalidatePath } from "next/cache";
 
 export async function logInquiry(data: {
     productId?: string;
     productName: string;
     customerPhone?: string;
-}) {
+}): Promise<void> {
     await prisma.inquiry.create({
         data: {
             productId: data.productId || null,
@@ -27,7 +28,7 @@ export async function getInquiries({
 }: {
     page?: number;
     pageSize?: number;
-} = {}) {
+} = {}): Promise<{ inquiries: Inquiry[]; total: number; totalPages: number }> {
     const [inquiries, total] = await Promise.all([
         prisma.inquiry.findMany({
             include: { product: { select: { id: true, name: true, sku: true } } },
@@ -39,13 +40,17 @@ export async function getInquiries({
     ]);
 
     return {
-        inquiries,
+        inquiries: inquiries,
         total,
         totalPages: Math.ceil(total / pageSize),
     };
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<{
+    totalProducts: number;
+    outOfStock: number;
+    totalLeads: number;
+}> {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
